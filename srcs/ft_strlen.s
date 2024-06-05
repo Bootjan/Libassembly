@@ -2,16 +2,14 @@ section .text
 	global ft_strlen
 
 ft_strlen:
-	xor		rax, rax				; i = 0
+	xor		rax, rax
 
 	startLoop:
-		xor		cl, cl
-		mov		cl, [rdi + rax]		; cl = str[i]
+		cmp		BYTE [rdi + rax], 0
+		je		return
 
-		cmp		cl, 0				; str[i] == 0
-		je		end					; if true, go to end
+		inc		rax
+		jmp		startLoop
 
-		inc		rax					; increment loopcounter
-		loop	startLoop			; go back to top
-	end:
+	return:
 		ret

@@ -2,17 +2,16 @@ section .text
 	global ft_strcpy
 
 ft_strcpy:
-	xor	rax,rax					; i = 0
+	xor	r10, r10
+	mov	rax, rdi
 
 	startLoop:
-		xor		cl,cl			; curr_char = '\0'
-		mov		cl,BYTE [rsi + rax]	; str[i]
+		mov	r10b, [rsi]
+		mov	[rdi], r10b
 
-		cmp		cl,0			; str[i] == '\0'
-		je		end				; if true, go to end
-		mov		BYTE [rdi + rax],cl	; else cpy curr_char to dest
-		inc		rax				; i++
-		loop	startLoop		; go to start loop
-	end:
-		mov		rax, rdi
-		ret						; return
+		inc	rsi
+		inc	rdi
+		cmp	r10b, 0
+		jne	startLoop
+
+		ret

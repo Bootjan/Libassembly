@@ -2,30 +2,25 @@ section .text
 	global ft_strcmp
 
 ft_strcmp:
-	xor	rcx,rcx							; i = 0
-	xor	rax,rax							; set entire return value to 0
+	xor	rax, rax
+	xor	rcx, rcx
 
 	startLoop:
-		mov		al, BYTE [rdi + rcx]	; al = s1[i]
+		mov	al, BYTE [rdi]
+		mov	cl, BYTE [rsi]
 
-		cmp		al, BYTE [rsi + rcx]	; s1[i] == s2[i]
-		jne		diffStrings				; if false, go to diffStrings
+		cmp	al, 0
+		je	return
 
-		cmp		al,0					; end of one string
-		jne		increment				; if true check for other
+		cmp	al, cl
+		jne	return
 
-		cmp		BYTE [rsi + rcx], 0		; end of other string
-		je		equalStrings			; if true, strings are the same
+		xor	al, al
+		xor	cl, cl
+		inc	rdi
+		inc	rsi
+		jmp	startLoop	
 
-	increment:
-		inc		rcx						; i++
-		jmp		startLoop				; go to begin of loop
-
-	equalStrings:
-		xor		rax,rax					; set return value to 0
-		ret
-	diffStrings:
-		xor		rbx,rbx					; xor
-		mov		bl, BYTE [rsi + rcx]	; load byte
-		sub		eax, DWORD ebx 			; substract to signed int
+	return:
+		sub	rax, rcx
 		ret
