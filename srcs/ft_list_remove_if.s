@@ -36,7 +36,7 @@ ft_list_remove_if:
 		pop		r10
 		pop		r9
 
-		cmp		rax, 0			; cmp == 0
+		cmp		eax, 0			; cmp == 0
 		je		removeElement
 
 		jmp		updateCurrPrev

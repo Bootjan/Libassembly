@@ -1,85 +1,136 @@
-section	.text:
+section	.text
+	global	push_front
+
+push_front:		; t*		push_front(t* head, t* highest)
+	mov		[rsi + 8],	rdi
+	mov		rax,		rsi
+	ret
+
+section	.text
+	global	find_highest
+
+find_highest:		; t*	find_highest(t* current, int (*cmp)())
+	mov		r9,		rdi			; highest
+	mov		r10,	rdi			; current
+	mov		rcx,	rsi			; cmp
+
+	startLoop1:
+		mov		r10, [r10 + 8]	; current = current->next
+		cmp		r10, 0
+		je		return1
+
+		push	r9
+		push	r10
+		push	rcx
+
+		mov		rdi,	[r9]
+		mov		rsi,	[r10]
+		call	rcx
+
+		pop		rcx
+		pop		r10
+		pop		r9
+
+		cmp		eax, 	0
+		jg		startLoop1
+
+	updateHighest:
+		mov		r9,		r10		
+		jmp		startLoop1
+
+	return1:
+		mov		rax,	r9
+		ret
+
+
+section	.text
+	global	remove_highest
+
+remove_highest:			; t*	remove_highest(t* current, t* highest)
+	mov		r9,		rdi		; save head
+	xor		r10,	r10		; prev = NULL
+
+	startLoop2:
+		cmp		rdi, rsi				; current = highest
+		je		removeHighest
+	
+		cmp		rdi,		0
+		je		return2
+
+		mov		r10, 	rdi				; prev = current
+		mov		rdi,	[rdi + 8]		; current = current->next
+		jmp		startLoop2
+
+	removeHighest:
+		cmp		r10,	0
+		je		removeHead
+
+		mov		rcx,		[rdi + 8]
+		mov		[r10 + 8],	rcx
+		mov		rax,		r9
+		ret
+
+	removeHead:
+		mov		rax,	[rdi + 8]
+		ret
+
+	return2:
+		mov		rax,	r9
+		ret
+
+section	.text
 	global	ft_list_sort
 
-ft_list_sort:	; 	void	ft_list_sort_helper(t** head, int (*cmp)())
-	push	rsi			; rsi = cmp [rbp + 8]
-	mov		r10, [rdi]	; r10 = current
-	mov		r8,	r10		; save first element
+ft_list_sort:	; void	ft_list_sort(t** head, int (*cmp)());
+	xor		rax,	rax
+	mov		r9,		[rdi]		; current
+	mov		[rdi],	rax			; *head = NULL
+	mov		r10,	rdi			; head
+	mov		r11,	rsi			; cmp
 
-	cmp		r10, 0
-	je		return
 
-	xor		[rdi], r10	;
-	push	rdi			; rdi = head [rbp]
+	startLoop3:
+		cmp		r9,		0
+		je		return3
 
-	startLoop:
-		mov		r9, r10		; highest = current
-		mov		r10, [r10 + 8]	; current = current->next
+		push	r11
+		push	r10
+		push	r9
 
-	findHighest:
-		cmp		r10, 0		; current == NULL
-		je		removeHighest
+		mov		rdi,	r9
+		mov		rsi,	r11
+
+		call	find_highest		; rax = highest
+
+		mov		r8,		rax			; r8 = highest
+
+		pop		r9
+		push	r9
+		push	r8
+		mov		rsi,	r8
+		mov		rdi, r9
+		call	remove_highest	
+
+		pop		r8
+		pop		r9
+		mov		r9,		rax
+		pop		r10
 
 		push	r10
 		push	r9
 		push	r8
-		mov		rdi, r9		; highest is 1st arg
-		mov		rsi, r10	; current is 2nd arg
-		call	[rbp + 24]
+
+		mov		rdi,	[r10]
+		mov		rsi,	r8
+		call	push_front
 
 		pop		r8
 		pop		r9
 		pop		r10
+		mov		[r10], rax
+		pop		r11
 
-		cmp		rax, 0
-		jl		switchHighest
+		jmp		startLoop3
 
-		mov		r10, [r10 + 8]
-		jmp		findHighest
-
-	switchHighest:
-		mov		r9, r10
-		mov		r10, [r10 + 8]
-		jmp		findHighest
-
-	removeHighest:
-		xor		r11, r11	; r11 = prev = NULL
-		mov		r10, r8		; r10 = currnt
-
-	removeLoop:
-		cmp		r9, r10
-		je		remove
-
-		mov		r11, r10
-		mov		r10, [r10 + 8]
-		jmp		removeLoop
-	
-	remove:
-		cmp		r11, 0
-		je		removeHead
-
-		mov		rax, [r10 + 8]
-		mov		[r11 + 8], rax
-		jmp		pushHighest
-
-	removeHead:
-		mov		r8, [r8 + 8]
-		jmp		pushHighest
-
-
-	pushHighest:
-		mov		rax, [rbp + 8]
-		mov		rax, [rax]
-		mov		[r9 + 8], rax
-		mov		[rax], r9
-
-		mov		r9, r8
-		cmp		r9, 0
-		je		return
-
-		mov		r10, [r9 + 8]
-		jmp		startLoop
-
-	return:
+	return3:
 		ret
-
