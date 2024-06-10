@@ -196,20 +196,20 @@ skip_plus_minus:	; const char*	skip_plus_minus(const char* str)
 		mov		rax,	rdi
 		ret
 
-
 section	.text
-	global	times_ten
+	global	mult_num
 
-times_ten:	;int	times_ten(int x)	
+mult_num:	;int	mult_num(int x, int y)	
+	mov	r8,		rsi
 	xor	rcx,	rcx
 	xor	rax,	rax
 
 	startLoop_ten:
-		cmp		ecx,	DWORD 10
-		je		return
+		cmp		ecx,	r8d
+		jge		return
 
 		add		eax,	edi
-		inc		ecx
+		inc		r8d
 		jmp		startLoop_ten
 	
 	return:
