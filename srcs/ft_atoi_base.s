@@ -67,7 +67,7 @@ section	.text
 	global	check_base
 	extern	ft_strlen,@function
 
-check_base:		; int	check_base(const char* base) -> return 0 on 'success', -1 on error
+check_base:		; int	check_base(const char* base) -> return base_len on 'success', -1 on error
 	mov		r9,		rdi
 
 	; ||---- Check length
@@ -80,6 +80,7 @@ check_base:		; int	check_base(const char* base) -> return 0 on 'success', -1 on 
 
 
 	; ||---- check for "+- "
+	push	rax
 	push	r9
 	mov		rdi,	r9
 	xor		rax,	rax
@@ -87,27 +88,32 @@ check_base:		; int	check_base(const char* base) -> return 0 on 'success', -1 on 
 	mov		rsi,	rax
 	call	string_contains
 	pop		r9
+	pop		r10
 
 	cmp		rax,	0
 	jl		return_error
 
 	push	r9
+	push	r10
 	mov		rdi,	r9
 	xor		rax,	rax
 	mov		al,		'-'
 	mov		rsi,	rax
 	call	string_contains
+	pop		r10
 	pop		r9
 
 	cmp		rax,	0
 	jl		return_error
 
 	push	r9
+	push	r10
 	mov		rdi,	r9
 	xor		rax,	rax
 	mov		al,		'-'
 	mov		rsi,	rax
 	call	string_contains
+	pop		r10
 	pop		r9
 
 	cmp		rax,	0
@@ -115,14 +121,17 @@ check_base:		; int	check_base(const char* base) -> return 0 on 'success', -1 on 
 
 	; ||---- check for duplicates
 	push	r9
+	push	r10
 	mov		rdi,	r9
 	call	check_duplicates
+	pop		r10
 	pop		r9
 
 	cmp		rax,	0
 	jne		return_error
 
 	xor		rax,	rax
+	mov		rax,	r10
 	ret
 
 	return_error:
@@ -196,6 +205,7 @@ skip_plus_minus:	; const char*	skip_plus_minus(const char* str)
 		mov		rax,	rdi
 		ret
 
+
 section	.text
 	global	mult_num
 
@@ -233,31 +243,33 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 	cmp		rax,	0
 	jne		return_base_error
 	
-	push	r8
 	push	r9
+	push	rax
 	mov		rdi,	r8
 	call	skip_spaces
+	pop		rdi
 	pop		r9
-	pop		r8
 	mov		r8,		rax
 
 	push	r8
 	push	r9
+	push	rdi
 	mov		rdi,	r8
 	call	compute_sign
+	pop		rdi
 	pop		r9
 	pop		r8
 	xor		r10,	r10		; sign
 	mov		r10,	rax
 
-	push	r8
 	push	r9
 	push	r10
+	push	rdi
 	mov		rdi,	r8
 	call	skip_plus_minus
+	pop		rdi
 	pop		r10
 	pop		r9
-	pop		r8
 	mov		r8,		rax
 
 	xor		r11,	r11		; return val
@@ -270,6 +282,7 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		push	r9
 		push	r10
 		push	r11
+		push	rdi
 
 		mov		rdi,	r9
 		xor		rax,	rax
@@ -277,6 +290,7 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		mov		rsi,	rax
 		call	string_contains
 
+		pop		rdi
 		pop		r11
 		pop		r10
 		pop		r9
@@ -288,14 +302,15 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		push	r8
 		push	r9
 		push	r10
-		push	r11
 		push	rax
+		pop		rdi
 
+		mov		rsi,	rdi
 		mov		rdi,	r11
-		call	times_ten
+		call	mult_num
 
+		pop		rdi
 		pop		rdx
-		pop		r11
 		pop		r10
 		pop		r9
 		pop		r8
