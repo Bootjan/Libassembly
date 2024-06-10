@@ -219,7 +219,7 @@ mult_num:	;int	mult_num(int x, int y)
 		jge		return
 
 		add		eax,	edi
-		inc		r8d
+		inc		ecx
 		jmp		startLoop_ten
 	
 	return:
@@ -231,6 +231,7 @@ section	.text
 ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 	mov		r8,		rdi		; str
 	mov		r9,		rsi		; base
+	xor		rcx,	rcx
 
 	; ||---- check base for errors
 	push	r8
@@ -241,22 +242,22 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 	pop		r8
 
 	cmp		rax,	0
-	jne		return_base_error
+	jl		return_base_error
 	
 	push	r9
 	push	rax
 	mov		rdi,	r8
 	call	skip_spaces
-	pop		rdi
+	pop		rcx				; base len
 	pop		r9
 	mov		r8,		rax
 
 	push	r8
 	push	r9
-	push	rdi
+	push	rcx
 	mov		rdi,	r8
 	call	compute_sign
-	pop		rdi
+	pop		rcx
 	pop		r9
 	pop		r8
 	xor		r10,	r10		; sign
@@ -264,13 +265,13 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 
 	push	r9
 	push	r10
-	push	rdi
+	push	rcx
 	mov		rdi,	r8
 	call	skip_plus_minus
-	pop		rdi
+	pop		rcx
 	pop		r10
 	pop		r9
-	mov		r8,		rax
+	mov		r8,		rax		; r8: str, r9: base, r10: sign, rcx: base_len
 
 	xor		r11,	r11		; return val
 
@@ -282,7 +283,7 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		push	r9
 		push	r10
 		push	r11
-		push	rdi
+		push	rcx
 
 		mov		rdi,	r9
 		xor		rax,	rax
@@ -290,7 +291,7 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		mov		rsi,	rax
 		call	string_contains
 
-		pop		rdi
+		pop		rcx
 		pop		r11
 		pop		r10
 		pop		r9
@@ -299,21 +300,21 @@ ft_atoi_base:	; int		ft_atoi_base(const char* str, const char* base)
 		cmp		eax,	0
 		jl		return_atoi
 
+		push	rax
 		push	r8
 		push	r9
 		push	r10
-		push	rax
-		pop		rdi
+		push	rcx
 
-		mov		rsi,	rdi
 		mov		rdi,	r11
+		mov		rsi,	rcx
 		call	mult_num
 
-		pop		rdi
-		pop		rdx
+		pop		rcx
 		pop		r10
 		pop		r9
 		pop		r8
+		pop		rdx
 
 		mov		r11,	rax
 		add		r11d,	edx
