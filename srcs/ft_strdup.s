@@ -10,7 +10,7 @@ ft_strdup:
 
 	mov		rdi, rax
 	inc		rdi
-	call	malloc
+	call	malloc wrt ..plt
 
 	cmp		rax, 0
 	je		return

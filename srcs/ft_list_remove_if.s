@@ -70,7 +70,7 @@ ft_list_remove_if:
 		push	r10				; save current
 		call	rcx				; call free_data
 		pop		rdi				; retrieve current
-		call	free			; free current
+		call	free wrt ..plt			; free current
 
 		pop		rdi
 		pop		rcx

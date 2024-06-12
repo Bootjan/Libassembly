@@ -2,7 +2,7 @@ section .text
 	extern	__errno_location
 	global	ft_write
 
-ft_write:
+ft_write:		; int ft_write(int fd, const char* buff, size_t count)
 	mov	rax, 1 
 	syscall
 
@@ -14,7 +14,7 @@ ft_write:
 	error:
 		xor		rdi, rdi
 		sub		rdi, rax
-		call	__errno_location
+		call	__errno_location wrt ..plt
 		mov		[rax], rdi
 		mov		rax, -1
 		ret

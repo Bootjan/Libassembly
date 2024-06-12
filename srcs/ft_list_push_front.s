@@ -7,7 +7,7 @@ ft_create_element:
 	push	rdi
 
 	mov		rdi, 16
-	call	malloc
+	call	malloc wrt ..plt
 
 	cmp		rax, 0
 	je		return_element

@@ -5,14 +5,14 @@ OBJS_DIR = objs
 OBJS = $(SRCS:$(SRCS_DIR)/%.s=$(OBJS_DIR)/%.o)
 
 NASM = nasm
-NASM_FLAGS = -f elf64
+NASM_FLAGS = -felf64
 
 NAME = libasm.a
 
 RM = rm -rf
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -Wpedantic -g
+CC = gcc
+CFLAGS = -pie -Wall -Wextra -Werror -Wpedantic -g
 
 MAIN = main.c
 OUTPUT = output 

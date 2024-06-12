@@ -146,7 +146,7 @@ skip_spaces:	; const char*	skip_spaces(const char* str)
 	jmp		startLoop3
 
 	updateStrSigns:
-		inc		rdi
+		inc		rdi		; str++
 	startLoop3:
 		cmp		BYTE [rdi], 32
 		je		updateStrSigns
